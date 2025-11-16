@@ -1,25 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setCurrentUser } from "./store/usersSlice";
 
-function App() {
+import UsersManager from "./component/UsersManager";
+import UserDetailsModal from "./component/UserDetailsModal";
+import AddUserForm from "./component/AddUserForm";
+
+export default function App() {
+  const dispatch = useDispatch();
+  const users = useSelector((state) => state.users.users);
+
+  useEffect(() => {
+    if (users.length > 0) {
+      dispatch(setCurrentUser(users[0])); // משתמש ברירת מחדל
+    }
+  }, [dispatch, users]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <Routes>
+        <Route path="/" element={<UsersManager />} />
+        <Route path="/user/:id" element={<UserDetailsModal />} />
+        <Route path="/add-user" element={<AddUserForm />} />
+      </Routes>
   );
 }
-
-export default App;
