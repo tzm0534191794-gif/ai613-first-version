@@ -5,7 +5,18 @@ export default function UsersList() {
   const users = useSelector(state => state.users.users);
   const dispatch = useDispatch();
 
-  
+  const groups = [
+    "מתכנת",
+    "מתכונים",
+    "מעצב",
+    "פעילויות"
+  ];
+
+  const statusMap = {
+    active: "פעיל",
+    inactive: "לא פעיל",
+    blocked: "חסום"
+  };
 
   return (
     <div>
@@ -28,7 +39,8 @@ export default function UsersList() {
               <td>{u.email}</td>
               <td>{u.group}</td>
               <td>{u.role}</td>
-              <td>{u.isActive ? "פעיל" : "חסום"}</td>
+              <td>{statusMap[u.status]}</td>
+
               <td>
                 <button onClick={() => dispatch(selectUser(u))}>פרטים</button>
               </td>

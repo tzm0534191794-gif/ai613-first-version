@@ -1,9 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+
 const initialState = {
   users: [
-    { id: 1, name: "דנה", email: "dana@gmail.com", group: "קבוצה A", role: "Admin", isDeveloper: true, isActive: true },
-    { id: 2, name: "אבי", email: "avi@gmail.com", group: "קבוצה B", role: "user", isDeveloper: false, isActive: true }
+    { id: 1, name: "דנה", email: "dana@gmail.com", group: "מתכנת", role: "Admin", isDeveloper: true, status: "active"
+},
+    { id: 2, name: "אבי", email: "avi@gmail.com", group: "מתכנת", role: "user", isDeveloper: false, status: "active"
+}
   ],
   selectedUser: null,
   currentUser: null,
@@ -30,21 +33,24 @@ const usersSlice = createSlice({
       state.currentUser = action.payload;
     },
     resetPassword: (state, action) => {
-      const { id } = action.payload;
-      const user = state.users.find(u => u.id === id);
-      if (user) {
-        const newPassword = Math.random().toString(36).slice(-8); // סיסמה חדשה אקראית
-        user.password = newPassword; // מוסיפים שדה סיסמה
-        console.log(`סיסמה חדשה ל-${user.email}: ${newPassword}`); // פה אפשר גם לשלוח מייל
-      }
-    },
+  const { id, newPassword } = action.payload;
+  const user = state.users.find(u => u.id === id);
+  if (user) {
+    user.password = newPassword;
+  }
+},
     changeStatus: (state, action) => {
-      const { id, isActive } = action.payload;
-      const user = state.users.find(u => u.id === id);
-      if (user) {
-        user.isActive = isActive;
-      }
-    }
+  const { id, newStatus } = action.payload;
+  const user = state.users.find(u => u.id === id);
+
+  if (user) {
+    user.status = newStatus;   // עדכון סטטוס נכון
+  }
+
+  if (state.selectedUser && state.selectedUser.id === id) {
+    state.selectedUser.status = newStatus; // עדכון גם בפרטי משתמש
+  }
+}
   }
 });
 

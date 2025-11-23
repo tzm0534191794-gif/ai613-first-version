@@ -8,7 +8,7 @@ export default function UsersManager() {
   const [isAdding, setIsAdding] = useState(false);
 
   const navigate = useNavigate();
-<button onClick={() => navigate("add-user")}>הוסף משתמש חדש</button>
+<button onClick={() => navigate("/add-user")}>הוסף משתמש חדש</button>
 
   return (
     <div>

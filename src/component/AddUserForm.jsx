@@ -6,14 +6,18 @@ export default function AddUserForm({ onCancel }) {
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.users.currentUser);
 
+  const groups = [
+  "מתכנת",
+  "מתכונים",
+  "מעצב",
+  "פעילויות"
+];
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
-    group: "לא משוייך",
-    role: "user",
-    isDeveloper: false,
-    isActive: true
+    group: groups[0]
+     
   });
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
@@ -43,15 +47,14 @@ export default function AddUserForm({ onCancel }) {
       <br />
 
       <label>קבוצה:</label>
-      <input name="group" value={form.group} onChange={handleChange} />
+      <select name="group" value={form.group} onChange={handleChange}>
+        {groups.map(g => (
+          <option key={g} value={g}>{g}</option>
+        ))}
+      </select>
       <br />
 
-      <label>תפקיד:</label>
-      <select name="role" value={form.role} onChange={handleChange}>
-        <option value="user">משתמש רגיל</option>
-        {currentUser.role === "Admin" && <option value="Admin">מנהל</option>}
-      </select>
-      <br /><br />
+     
 
       <button onClick={handleAddUser}>הוסף</button>
       <button onClick={onCancel}>ביטול</button>
