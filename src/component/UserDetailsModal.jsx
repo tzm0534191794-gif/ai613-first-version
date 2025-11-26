@@ -1,3 +1,4 @@
+
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser, clearSelectedUser, resetPassword, changeStatus } from "../store/usersSlice";
 import { useState, useEffect } from "react";
@@ -7,46 +8,41 @@ export default function UserDetailsModal() {
   const currentUser = useSelector(state => state.users.currentUser);
   const dispatch = useDispatch();
 
-  const groups = [
-  "מתכנת",
-  "מתכונים",
-  "מעצב",
-  "פעילויות"
-];
+  const [editMode, setEditMode] = useState(false);
+
+  const groups = ["מתכנת", "מתכונים", "מעצב", "פעילויות"];
 
   const [form, setForm] = useState({
     name: "",
     email: "",
     group: "",
     role: "user",
-    isDeveloper: false,
-    status: "active"   
+    isDeveloper: true,
+    status: "active"
   });
 
+  const [pendingStatus, setPendingStatus] = useState(null);
   const [showMessageForm, setShowMessageForm] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
-  const [pendingStatus, setPendingStatus] = useState(null);
 
   useEffect(() => {
     if (user) {
       setForm({
         ...user,
-        status: user.status || "active"
-
+        role: user.role || "user",
+        status: user.status || "active",
+        isDeveloper: user.isDeveloper ?? true
       });
     }
   }, [user]);
 
   if (!user) return null;
 
-  const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
   const handleUpdate = () => {
     if (currentUser.role !== "Admin") return alert("אין לך הרשאה לבצע פעולה זו");
     dispatch(updateUser(form));
     alert("פרטי המשתמש עודכנו");
+    setEditMode(false);
   };
 
   const handleResetPassword = () => {
@@ -57,12 +53,9 @@ export default function UserDetailsModal() {
     alert(`סיסמה חדשה נשלחה למייל: ${user.email}\nסיסמה: ${newPassword}`);
   };
 
-  
-
   const handleChangeStatus = () => {
     if (currentUser.role !== "Admin") return alert("אין לך הרשאה לבצע פעולה זו");
 
-    // בודק אם המשתמש בחר סטטוס חדש בטופס
     if (!pendingStatus) {
       alert("בחר סטטוס חדש לפני שינוי");
       return;
@@ -71,83 +64,111 @@ export default function UserDetailsModal() {
     dispatch(changeStatus({ id: user.id, newStatus: pendingStatus }));
     setForm(prev => ({ ...prev, status: pendingStatus }));
 
-
-    // פותח טופס הודעה
     setShowMessageForm(true);
   };
 
   const handleSendMessage = () => {
     alert(`הודעה נשלחה למשתמש:\n${user.email}`);
 
-    // איפוס הטופס
     setShowMessageForm(false);
-    setStatusMessage("");
     setPendingStatus(null);
+    setStatusMessage("");
   };
 
   return (
     <div style={{ background: "#ddd", padding: 20 }}>
       <h2>פרטי משתמש</h2>
 
-      <label>שם:</label>
-      <input name="name" value={form.name} onChange={handleChange} />
-      <br />
+      {/* מצב תצוגה */}
+      {!editMode && (
+        <>
+          <p><strong>שם:</strong> {form.name}</p>
+          <p><strong>אימייל:</strong> {form.email}</p>
+          <p><strong>קבוצה:</strong> {form.group}</p>
+          <p><strong>סטטוס:</strong> {form.status}</p>
+          <p><strong>מפתח:</strong> {form.isDeveloper ? "כן" : "לא"}</p>
 
-      <label>אימייל:</label>
-      <input name="email" value={form.email} onChange={handleChange} />
-      <br />
+          <hr />
 
-      <label>קבוצה:</label>
-      <select name="group" value={form.group} onChange={handleChange}>
-        {groups.map(g => (
-          <option key={g} value={g}>{g}</option>
-        ))}
-      </select>
+          <button>ניהול מודלים למשתמש</button>
+          <br /><br />
 
-      <label>תפקיד:</label>
-      <select name="role" value={form.role} onChange={handleChange}>
-        <option value="user">משתמש רגיל</option>
-        {currentUser.role === "Admin" && <option value="Admin">מנהל</option>}
-      </select>
-      <br />
+          <button>ניהול פיצ'רים למשתמש</button>
+          <br /><br />
 
-      {/* סטטוס חדש */}
-      <label>סטטוס:</label>
-      <select
-        value={pendingStatus || form.status}
-        onChange={(e) => setPendingStatus(e.target.value)}
-      >
-        <option value="active">פעיל</option>
-        <option value="inactive">לא פעיל</option>
-        <option value="blocked">חסום</option>
-      </select>
-      <br /><br />
+          <button onClick={() => setEditMode(true)}>עדכון פרטים</button>
+          <br /><br />
 
-      <button onClick={handleUpdate}>שמור שינויים</button>
-      <button onClick={handleResetPassword}>איפוס סיסמה</button>
-      <button onClick={handleChangeStatus}>שינוי סטטוס</button>
-      <button onClick={() => dispatch(clearSelectedUser())}>סגור</button>
+          <button onClick={() => dispatch(clearSelectedUser())}>סגור</button>
+        </>
+      )}
 
+      {/* מצב עריכה */}
+      {editMode && (
+        <>
+          <label>שם:</label>
+          <input
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
+          <br />
 
-      {/* טופס הודעה שמופיע רק לאחר שינוי סטטוס */}
+          <label>אימייל:</label>
+          <input
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+          />
+          <br />
+
+          <label>קבוצה:</label>
+          <select
+            value={form.group}
+            onChange={(e) => setForm({ ...form, group: e.target.value })}
+          >
+            {groups.map(g => <option key={g} value={g}>{g}</option>)}
+          </select>
+          <br />
+
+          <label>מפתח:</label>
+          <input
+            type="checkbox"
+            checked={form.isDeveloper}
+            onChange={(e) => setForm({ ...form, isDeveloper: e.target.checked })}
+          />
+          <br />
+
+          <label>סטטוס חדש:</label>
+          <select
+            value={pendingStatus || form.status}
+            onChange={(e) => setPendingStatus(e.target.value)}
+          >
+            <option value="active">פעיל</option>
+            <option value="inactive">לא פעיל</option>
+            <option value="blocked">חסום</option>
+          </select>
+
+          <button onClick={handleChangeStatus}>שינוי סטטוס</button>
+
+          <br /><br />
+
+          <button onClick={handleUpdate}>שמור שינויים</button>
+          <button onClick={handleResetPassword}>איפוס סיסמה</button>
+          <button onClick={() => setEditMode(false)}>חזור</button>
+        </>
+      )}
+
       {showMessageForm && (
-        <div style={{
-          marginTop: 20,
-          padding: 20,
-          background: "#fff",
-          border: "1px solid #aaa",
-          borderRadius: 6
-        }}>
-          <h3>שינית את הסטטוס, נא שלח סיבה לשינוי</h3>
+        <div style={{ marginTop: 20, padding: 20, background: "#fff", border: "1px solid #aaa", borderRadius: 6 }}>
+          <h3>שינית את הסטטוס, נא שלח סיבה למשתמש</h3>
 
           <textarea
             style={{ width: "100%", height: 120 }}
             value={statusMessage}
             onChange={(e) => setStatusMessage(e.target.value)}
-            placeholder="כתוב הסבר למשתמש על שינוי הסטטוס..."
+            placeholder="כתוב הסבר למשתמש..."
           />
 
-          <br />
+          <br /><br />
 
           <button onClick={handleSendMessage}>שלח הודעה</button>
           <button onClick={() => setShowMessageForm(false)}>ביטול</button>

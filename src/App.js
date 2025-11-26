@@ -13,7 +13,7 @@ export default function App() {
 
   useEffect(() => {
     if (users.length > 0) {
-      dispatch(setCurrentUser(users[0])); // משתמש ברירת מחדל
+      dispatch(setCurrentUser(users[0]));
     }
   }, [dispatch, users]);
 

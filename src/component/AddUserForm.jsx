@@ -1,23 +1,22 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../store/usersSlice";
+import { useNavigate } from "react-router-dom";
 
-export default function AddUserForm({ onCancel }) {
+export default function AddUserForm() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const currentUser = useSelector(state => state.users.currentUser);
 
-  const groups = [
-  "מתכנת",
-  "מתכונים",
-  "מעצב",
-  "פעילויות"
-];
+  const groups = ["מתכנת", "מתכונים", "מעצב", "פעילויות"];
+
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
-    group: groups[0]
-     
+    group: groups[0],
+    role: "User",
+    status: "active"
   });
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,9 +24,11 @@ export default function AddUserForm({ onCancel }) {
   const handleAddUser = () => {
     if (currentUser.role !== "Admin") return alert("אין לך הרשאה לבצע פעולה זו");
     if (!form.password) return alert("יש להזין סיסמה");
+
     dispatch(addUser(form));
     alert("המשתמש נוסף בהצלחה");
-    onCancel();
+
+    navigate("/"); 
   };
 
   return (
@@ -52,12 +53,10 @@ export default function AddUserForm({ onCancel }) {
           <option key={g} value={g}>{g}</option>
         ))}
       </select>
-      <br />
-
-     
+      <br /><br />
 
       <button onClick={handleAddUser}>הוסף</button>
-      <button onClick={onCancel}>ביטול</button>
+      <button onClick={() => navigate("/")}>ביטול</button>
     </div>
   );
 }

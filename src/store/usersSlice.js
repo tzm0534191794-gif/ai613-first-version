@@ -3,10 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   users: [
-    { id: 1, name: "דנה", email: "dana@gmail.com", group: "מתכנת", role: "Admin", isDeveloper: true, status: "active"
-},
-    { id: 2, name: "אבי", email: "avi@gmail.com", group: "מתכנת", role: "user", isDeveloper: false, status: "active"
-}
+    { id: 1, name: "דנה", email: "dana@gmail.com", group: "מתכנת", role: "Admin", isDeveloper: true, status: "active"},
+    { id: 2, name: "אבי", email: "avi@gmail.com", group: "מתכנת", role: "user", isDeveloper: false, status: "active"}
   ],
   selectedUser: null,
   currentUser: null,
@@ -44,11 +42,11 @@ const usersSlice = createSlice({
   const user = state.users.find(u => u.id === id);
 
   if (user) {
-    user.status = newStatus;   // עדכון סטטוס נכון
+    user.status = newStatus;   
   }
 
   if (state.selectedUser && state.selectedUser.id === id) {
-    state.selectedUser.status = newStatus; // עדכון גם בפרטי משתמש
+    state.selectedUser.status = newStatus; 
   }
 }
   }
