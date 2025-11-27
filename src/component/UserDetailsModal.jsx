@@ -1,11 +1,17 @@
-
 import { useDispatch, useSelector } from "react-redux";
-import { updateUser, clearSelectedUser, resetPassword, changeStatus } from "../store/usersSlice";
+import { updateUser, resetPassword, changeStatus } from "../store/usersSlice";
 import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function UserDetailsModal() {
-  const user = useSelector(state => state.users.selectedUser);
-  const currentUser = useSelector(state => state.users.currentUser);
+  const { id } = useParams();
+  const navigate = useNavigate(); 
+
+  const user = useSelector((state) =>
+    state.users.users.find((u) => String(u.id) === String(id))
+  );
+
+  const currentUser = useSelector((state) => state.users.currentUser);
   const dispatch = useDispatch();
 
   const [editMode, setEditMode] = useState(false);
@@ -36,7 +42,8 @@ export default function UserDetailsModal() {
     }
   }, [user]);
 
-  if (!user) return null;
+  if (!user) return <div>משתמש לא נמצא</div>;
+
 
   const handleUpdate = () => {
     if (currentUser.role !== "Admin") return alert("אין לך הרשאה לבצע פעולה זו");
@@ -62,7 +69,7 @@ export default function UserDetailsModal() {
     }
 
     dispatch(changeStatus({ id: user.id, newStatus: pendingStatus }));
-    setForm(prev => ({ ...prev, status: pendingStatus }));
+    setForm((prev) => ({ ...prev, status: pendingStatus }));
 
     setShowMessageForm(true);
   };
@@ -99,7 +106,7 @@ export default function UserDetailsModal() {
           <button onClick={() => setEditMode(true)}>עדכון פרטים</button>
           <br /><br />
 
-          <button onClick={() => dispatch(clearSelectedUser())}>סגור</button>
+          <button onClick={() => navigate(-1)}>חזור</button>
         </>
       )}
 
@@ -125,7 +132,9 @@ export default function UserDetailsModal() {
             value={form.group}
             onChange={(e) => setForm({ ...form, group: e.target.value })}
           >
-            {groups.map(g => <option key={g} value={g}>{g}</option>)}
+            {groups.map((g) => (
+              <option key={g} value={g}>{g}</option>
+            ))}
           </select>
           <br />
 
@@ -158,7 +167,13 @@ export default function UserDetailsModal() {
       )}
 
       {showMessageForm && (
-        <div style={{ marginTop: 20, padding: 20, background: "#fff", border: "1px solid #aaa", borderRadius: 6 }}>
+        <div style={{
+          marginTop: 20,
+          padding: 20,
+          background: "#fff",
+          border: "1px solid #aaa",
+          borderRadius: 6
+        }}>
           <h3>שינית את הסטטוס, נא שלח סיבה למשתמש</h3>
 
           <textarea

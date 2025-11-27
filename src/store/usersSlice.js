@@ -3,8 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   users: [
-    { id: 1, name: "דנה", email: "dana@gmail.com", group: "מתכנת", role: "Admin", isDeveloper: true, status: "active"},
-    { id: 2, name: "אבי", email: "avi@gmail.com", group: "מתכנת", role: "user", isDeveloper: false, status: "active"}
+    { id: 1, name: "צביה", email: "tz@gmail.com", group: "מתכנת", role: "Admin", isDeveloper: true, status: "active"},
+    { id: 2, name: "חנה", email: "chana@gmail.com", group: "מתכנת", role: "user", isDeveloper: false, status: "active"}
   ],
   selectedUser: null,
   currentUser: null,
